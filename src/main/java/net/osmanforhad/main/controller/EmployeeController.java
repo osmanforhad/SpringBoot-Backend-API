@@ -1,10 +1,13 @@
 package net.osmanforhad.main.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,22 +48,38 @@ public class EmployeeController {
 				.orElseThrow(() -> new ResourceNotFoundException("Employee not exists with id :" + id));
 		return ResponseEntity.ok(employee);
 	}
-	
-	//update employee
+
+	// update employee
 	@PutMapping("/employee/{id}")
-	public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee updateEmployee){
-		//retrieve and check the employee based on user given id
+	public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee updateEmployee) {
+		// retrieve and check the employee based on user given id
 		Employee employee = employeeRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Employee not exists with id :" + id));
-		//update the employee info
+		// update the employee info
 		employee.setFirstName(updateEmployee.getFirstName());
 		employee.setLastName(updateEmployee.getLastName());
 		employee.setEmailId(updateEmployee.getEmailId());
-		
-		//save updated info for this employee id
+
+		// save updated info for this employee id
 		Employee updatedEmployee = employeeRepository.save(employee);
-		
+
 		return ResponseEntity.ok(updatedEmployee);
+	}
+
+	// delete employee
+	@DeleteMapping("/employee/{id}")
+	public ResponseEntity<Map<String, Boolean>> deleteEmployee(@PathVariable Long id) {
+		// retrieve and check the employee based on user given id
+		Employee employee = employeeRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Employee not exists with id :" + id));
+		
+		//delete data
+		employeeRepository.delete(employee);
+		
+		//return message
+		Map<String, Boolean> response = new HashMap<String, Boolean>();
+		response.put("deleted", Boolean.TRUE);
+		return ResponseEntity.ok(response);
 	}
 
 }
